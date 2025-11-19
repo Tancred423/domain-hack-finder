@@ -23,6 +23,7 @@ const optionLabels: Record<ThemeOption, string> = {
   light: 'Light',
   dark: 'Dark',
 };
+const THEME_STORAGE_KEY = 'domain-hack-finder:theme';
 let mediaQuery: MediaQueryList | null = null;
 
 function applyTheme() {
@@ -32,9 +33,35 @@ function applyTheme() {
   document.documentElement.dataset.theme = nextTheme;
 }
 
+function saveThemePreference(option: ThemeOption) {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(THEME_STORAGE_KEY, option);
+  } catch {
+    // ignore storage errors (e.g., private mode)
+  }
+}
+
+function loadThemePreference(): ThemeOption | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const stored = window.localStorage.getItem(THEME_STORAGE_KEY) as ThemeOption | null;
+    if (stored && themeOptions.includes(stored)) {
+      return stored;
+    }
+  } catch {
+    // ignore storage errors
+  }
+  return null;
+}
+
 onMounted(() => {
   mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
   mediaQuery.addEventListener('change', applyTheme);
+  const storedTheme = loadThemePreference();
+  if (storedTheme) {
+    themeMode.value = storedTheme;
+  }
   applyTheme();
 });
 
@@ -42,7 +69,10 @@ onUnmounted(() => {
   mediaQuery?.removeEventListener('change', applyTheme);
 });
 
-watch(themeMode, applyTheme);
+watch(themeMode, (value) => {
+  saveThemePreference(value);
+  applyTheme();
+});
 
 function setTheme(option: ThemeOption) {
   themeMode.value = option;
@@ -91,7 +121,7 @@ function onSubmit(event: Event) {
       <header class="hero__header">
         <div class="hero__header-text">
           <h1>Domain Hack Finder</h1>
-          <p>Type a word and we will split it into clever TLD combinations.</p>
+          <p>Type a word and we will find domain hacks for it.</p>
         </div>
 
         <div class="theme-toggle" role="group" aria-label="Theme selection">
@@ -115,7 +145,7 @@ function onSubmit(event: Event) {
           v-model="query"
           type="text"
           name="query"
-          placeholder="Try emotes"
+          placeholder="Try 'emotes'"
           aria-label="Domain keyword"
           :disabled="isLoading"
         />
