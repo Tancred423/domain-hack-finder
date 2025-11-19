@@ -1,0 +1,19 @@
+{
+  "imports": {
+    "@std/": "https://deno.land/std@0.224.0/"
+  },
+  "tasks": {
+    "dev": "deno run --watch --allow-net --allow-read --allow-env backend/server.ts",
+    "start": "deno run --allow-net --allow-read --allow-env backend/server.ts"
+  },
+  "lint": {
+    "rules": {
+      "exclude": [
+        "no-explicit-any"
+      ]
+    }
+  },
+  "fmt": {
+    "lineWidth": 120
+  }
+}

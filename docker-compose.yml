@@ -1,0 +1,15 @@
+services:
+  app:
+    build:
+      context: .
+      target: dev
+    working_dir: /workspace
+    command: sleep infinity
+    volumes:
+      - .:/workspace
+    ports:
+      - "5173:5173"
+      - "4500:4500"
+    environment:
+      - PORT=4500
+
