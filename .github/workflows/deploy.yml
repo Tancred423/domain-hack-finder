@@ -19,7 +19,7 @@ jobs:
           deno-version: v2.5.6
 
       - name: Check formatting
-        run: deno fmt --check
+        run: deno fmt --check backend deno.json tld-list.json
 
       - name: Run linter
         run: deno lint
